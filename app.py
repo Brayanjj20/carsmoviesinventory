@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+import logging
 import requests
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
+
+logging.basicConfig(level=logging.INFO)
 
 API_URL = "https://carsmoviesinventoryproject-production.up.railway.app/api/v1/carsmovies?page=0&size=5&sort=carMovieYear,desc"
 API_POST_URL = "https://carsmoviesinventoryproject-production.up.railway.app/api/v1/carsmovies"
@@ -38,6 +41,7 @@ def create_movie():
 
 @app.route('/submit_movie', methods=['POST'])
 def submit_movie():
+    import logging
     try:
         car_movie_year = request.form.get('carMovieYear')
         if car_movie_year is None or car_movie_year.strip() == '':
@@ -57,6 +61,11 @@ def submit_movie():
         "carMovieYear": car_movie_year,
         "duration": duration
     }
+    # Validate required fields
+    if not movie_data["carMovieName"]:
+        flash('Car Movie Name is required.', 'danger')
+        return redirect(url_for('create_movie'))
+    logging.info(f"Submitting movie data: {movie_data}")
     try:
         response = requests.post(API_POST_URL, json=movie_data)
         response.raise_for_status()
@@ -73,8 +82,66 @@ def submit_movie():
             flash(f'Error creating movie: {e}', 'danger')
         return redirect(url_for('create_movie'))
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+
+from flask import jsonify
+
+from flask import jsonify, request
+
+@app.route('/update_movie/<movie_id>', methods=['PUT'])
+def update_movie(movie_id):
+    try:
+        data = request.get_json()
+        car_movie_year = data.get('carMovieYear')
+        if car_movie_year is None or (isinstance(car_movie_year, str) and car_movie_year.strip() == ''):
+            car_movie_year = None
+    except Exception:
+        return jsonify({'error': 'Invalid Car Movie Year.'}), 400
+
+    try:
+        duration = data.get('duration')
+        if duration is not None:
+            duration = int(duration)
+    except Exception:
+        return jsonify({'error': 'Invalid Duration: must be an integer.'}), 400
+
+    movie_data = {
+        "carMovieName": data.get('carMovieName'),
+        "carMovieYear": car_movie_year,
+        "duration": duration
+    }
+    try:
+        put_url = f"{API_POST_URL}/{movie_id}"
+        headers = {'Content-Type': 'application/json'}
+        response = requests.put(put_url, json=movie_data, headers=headers)
+        response.raise_for_status()
+        return jsonify({'message': 'Movie updated successfully!'}), 200
+    except requests.RequestException as e:
+        if e.response is not None:
+            try:
+                error_message = e.response.json().get('message', e.response.text)
+            except Exception:
+                error_message = e.response.text
+            return jsonify({'error': error_message}), 400
+        else:
+            return jsonify({'error': str(e)}), 400
+
+@app.route('/delete_movie/<movie_id>', methods=['DELETE'])
+def delete_movie(movie_id):
+    try:
+        delete_url = f"{API_POST_URL}/{movie_id}"
+        headers = {'Content-Type': 'application/json'}
+        response = requests.delete(delete_url, headers=headers)
+        response.raise_for_status()
+        return jsonify({'message': 'Movie deleted successfully!'}), 200
+    except requests.RequestException as e:
+        if e.response is not None:
+            try:
+                error_message = e.response.json().get('message', e.response.text)
+            except Exception:
+                error_message = e.response.text
+            return jsonify({'error': error_message}), 400
+        else:
+            return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

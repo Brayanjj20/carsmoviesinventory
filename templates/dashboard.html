@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cars Movies Dashboard</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #555;
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+        }
+        a {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            text-align: right;
+            text-decoration: none;
+            color: #555;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cars Movies Dashboard</h1>
+    <a href="{{ url_for('create_movie') }}">Create New Movie</a>
+    {% if cars_movies %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Car Movie Name</th>
+                <th>Year</th>
+                <th>Duration</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cars_movies %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.carMovieName }}</td>
+                <td>{{ item.carMovieYear }}</td>
+                <td>{{ item.duration }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center;">No data available.</p>
+    {% endif %}
+</body>
+</html>

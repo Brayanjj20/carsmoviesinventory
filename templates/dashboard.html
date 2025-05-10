@@ -4,29 +4,81 @@
     <meta charset="UTF-8">
     <title>Cars Movies Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative&display=swap');
+
+        .mysterious-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 3em;
+            color: #f0e68c;
+            text-shadow:
+                0 0 5px #f0e68c,
+                0 0 10px #f0e68c,
+                0 0 20px #ffd700,
+                0 0 30px #ffd700,
+                0 0 40px #ffd700,
+                0 0 50px #ffd700,
+                0 0 60px #ffd700;
+            animation: flicker 3s infinite alternate;
+        }
+
+        .mysterious-data {
+            font-family: 'Cinzel Decorative', cursive;
+            color: black;
+            text-shadow:
+                0 0 3px black,
+                0 0 6px black;
+            transition: color 0.3s ease;
+        }
+
+        .mysterious-data:hover {
+            color: #ffd700;
+            text-shadow:
+                0 0 10px #ffd700,
+                0 0 20px #ffd700;
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+                text-shadow:
+                    0 0 5px #f0e68c,
+                    0 0 10px #f0e68c,
+                    0 0 20px #ffd700,
+                    0 0 30px #ffd700,
+                    0 0 40px #ffd700,
+                    0 0 50px #ffd700,
+                    0 0 60px #ffd700;
+            }
+            20%, 22%, 24%, 55% {
+                opacity: 0.6;
+                text-shadow: none;
+            }
+        }
+    </style>
 </head>
-<body>
+<body style="background-color: black; color: #f0e68c;">
     <div class="container">
-        <h1>Cars Movies Dashboard</h1>
+        <h1 class="mysterious-title">Cars Movies Dashboard</h1>
         <a class="create-movie-link" href="{{ url_for('create_movie') }}">Create New Movie</a>
         {% if cars_movies %}
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Car Movie Name</th>
-                    <th>Year</th>
-                    <th>Duration</th>
-                    <th>Actions</th>
+                    <th class="mysterious-data">ID</th>
+                    <th class="mysterious-data">Car Movie Name</th>
+                    <th class="mysterious-data">Year</th>
+                    <th class="mysterious-data">Duration</th>
+                    <th class="mysterious-data">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in cars_movies %}
                 <tr>
-                    <td data-label="ID">{{ item.id }}</td>
-                    <td data-label="Car Movie Name">{{ item.carMovieName }}</td>
-                    <td data-label="Year">{{ item.carMovieYear }}</td>
-                    <td data-label="Duration">{{ item.duration }}</td>
+                    <td class="mysterious-data" data-label="ID">{{ item.id }}</td>
+                    <td class="mysterious-data" data-label="Car Movie Name">{{ item.carMovieName }}</td>
+                    <td class="mysterious-data" data-label="Year">{{ item.carMovieYear }}</td>
+                    <td class="mysterious-data" data-label="Duration">{{ item.duration }}</td>
                     <td data-label="Actions">
                         <button onclick="deleteMovie('{{ item.id }}')">Delete</button>
                         <button onclick="editMovie('{{ item.id }}', '{{ item.carMovieName }}', '{{ item.carMovieYear }}', '{{ item.duration }}')">Edit</button>
@@ -102,7 +154,7 @@ async function editMovie(id, name, year, duration) {
 </script>
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="modal">
+<div id="deleteModal" class="modal" style="display:none;">
   <div class="modal-content">
     <h3>Confirm Delete</h3>
     <p>Are you sure you want to delete this movie?</p>
@@ -114,7 +166,7 @@ async function editMovie(id, name, year, duration) {
 </div>
 
 <!-- Edit Movie Modal -->
-<div id="editModal" class="modal">
+<div id="editModal" class="modal" style="display:none;">
   <div class="modal-content">
     <h3>Edit Movie</h3>
     <form id="editForm">
